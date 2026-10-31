@@ -1,4 +1,4 @@
-// Writes index.html from index.src.html, the recorded command output and the picture credits.
+// Writes index.html from index.src.html and the recorded command output.
 import { readFileSync, writeFileSync } from "node:fs";
 
 const here = new URL(".", import.meta.url);
@@ -16,10 +16,6 @@ function terminal(text) {
     .join("\n");
 }
 
-const credits = JSON.parse(read("assets/credits.json"))
-  .map((item) => `<a href="${item.page}">${escape(item.title.replace(/, sh$/, ""))}</a>${item.creator ? `, ${escape(item.creator)}` : ""}, ${item.license}`)
-  .join(" · ");
-
 const outputs = {
   "rover-drift": read("output/rover-drift.txt"),
   "rover-explain": read("output/rover-explain.txt"),
@@ -30,5 +26,4 @@ const outputs = {
 
 let page = read("index.src.html");
 for (const [name, text] of Object.entries(outputs)) page = page.replaceAll(`{{${name}}}`, terminal(text));
-page = page.replace("{{credits}}", `Pictures: ${credits}`);
 writeFileSync(new URL("index.html", here), page);
