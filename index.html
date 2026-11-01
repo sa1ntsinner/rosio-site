@@ -10,38 +10,42 @@
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
-<main>
+<header class="top">
+  <a class="home" href="#top" aria-label="rosio, back to the top">
+    <svg viewBox="2 2 20 20.5" aria-hidden="true"><rect x="2" y="2" width="14" height="4"/><rect x="2" y="7.5" width="14" height="4"/><rect class="slid" x="8" y="13" width="14" height="4"/><rect x="2" y="18.5" width="14" height="4"/></svg>
+    <span>rosio</span>
+  </a>
+  <nav aria-label="Sections">
+    <a href="#layers">Layers</a>
+    <a href="#checks">Checks</a>
+    <a href="#where">Where it runs</a>
+    <a href="https://github.com/sa1ntsinner/rosio">GitHub</a>
+  </nav>
+</header>
+
+<main id="top">
 <section class="hero" aria-labelledby="hero-title">
-  <div class="hero-text">
-    <a class="home" href="#top" id="top" aria-label="rosio">
-      <svg viewBox="2 2 20 20.5" aria-hidden="true"><rect x="2" y="2" width="14" height="4"/><rect x="2" y="7.5" width="14" height="4"/><rect class="slid" x="8" y="13" width="14" height="4"/><rect x="2" y="18.5" width="14" height="4"/></svg>
-      <span>rosio</span>
-    </a>
-    <div class="hero-words">
-      <h1 id="hero-title" class="masked"><span><span>Find the layer</span></span> <span><span>that disagrees.</span></span></h1>
-      <p class="lead">rosio reads a ROS 2 system four ways (launch files, source code, the running graph and recorded bags) and names the line where they disagree.</p>
-      <div class="act">
-        <a class="button" href="#install">Install</a>
-        <a class="link" href="https://github.com/sa1ntsinner/rosio/tree/main/docs">Documentation</a>
-      </div>
-    </div>
+  <div class="hero-words">
+    <h1 id="hero-title" class="masked"><span><span>Find the layer</span></span> <span><span>that disagrees.</span></span></h1>
+    <p class="lead">rosio reads a ROS 2 system four ways, launch files, source code, the running graph and recorded bags, and names the line where they disagree.</p>
+    <a class="button" href="#install">Install</a>
   </div>
-  <div class="hero-tool">
-    <a class="corner" href="https://github.com/sa1ntsinner/rosio">GitHub</a>
+  <div class="stage">
+    <canvas class="solid" aria-hidden="true"></canvas>
     <div class="reader" data-ui aria-label="One parameter of the example rover, read by each layer">
       <p class="reader-name"><b>max_range</b> on /scan_filter</p>
       <div class="scale" role="radiogroup" aria-label="Layer">
-        <button role="radio" aria-checked="true" data-layer="declared" style="--c: var(--declared); --v: 10; --lost: 8">
-          <span class="layer">declared</span><span class="bar"><i></i></span><span class="value">10.0</span>
+        <button role="radio" aria-checked="true" tabindex="0" data-layer="declared" style="--c: var(--declared); --v: 10">
+          <span class="layer">declared</span><span class="gauge"><i></i></span><span class="value">10.0</span>
         </button>
-        <button role="radio" aria-checked="false" data-layer="coded" style="--c: var(--coded); --v: 12">
-          <span class="layer">coded</span><span class="bar"><i></i></span><span class="value">12.0</span>
+        <button role="radio" aria-checked="false" tabindex="-1" data-layer="coded" style="--c: var(--coded); --v: 12">
+          <span class="layer">coded</span><span class="gauge"><i></i></span><span class="value">12.0</span>
         </button>
-        <button role="radio" aria-checked="false" data-layer="observed" style="--c: var(--observed); --v: 0">
-          <span class="layer">observed</span><span class="bar"><i></i></span><span class="value">not run</span>
+        <button role="radio" aria-checked="false" tabindex="-1" data-layer="observed" style="--c: var(--observed); --v: 0">
+          <span class="layer">observed</span><span class="gauge"><i></i></span><span class="value">not run</span>
         </button>
-        <button role="radio" aria-checked="false" data-layer="recorded" style="--c: var(--recorded); --v: 0">
-          <span class="layer">recorded</span><span class="bar"><i></i></span><span class="value">none</span>
+        <button role="radio" aria-checked="false" tabindex="-1" data-layer="recorded" style="--c: var(--recorded); --v: 0">
+          <span class="layer">recorded</span><span class="gauge"><i></i></span><span class="value">none</span>
         </button>
       </div>
       <p class="readout" aria-live="polite">10.0 wins, set at <code>bringup.launch.py:28</code>. The 8.0 in <code>rover.yaml:4</code> never applies.</p>
@@ -50,13 +54,8 @@
 </section>
 
 <section id="output" class="show" aria-labelledby="output-title">
-  <div class="column">
-    <h2 id="output-title">What it prints</h2>
-    <p>The example rover in the repository carries five faults on purpose. Pick a command.</p>
-  </div>
-  <div class="panel" data-ui>
-    <div class="screen">
-      <pre class="sheet is-on" id="sheet-drift"><span class="prompt">$ rosio drift</span>
+  <figure class="plate" data-ui>
+    <pre class="sheet is-on" id="sheet-drift"><span class="prompt">$ rosio drift</span>
 5 findings: 1 error, 0 info, 4 warn
   <span class="sev-error">error</span> qos.incompatible  /safety_stop never receives /scan_filtered
         /safety_stop subscribes to /scan_filtered requesting reliable while /scan_filter publishes it best effort, so the two never connect and no message arrives.
@@ -76,7 +75,7 @@
         rover_bringup/config/rover.yaml:4 scan_filter.ros__parameters.max_range
         rover_bringup/launch/bringup.launch.py:28 parameters
   explain a finding id for the full evidence</pre>
-      <pre class="sheet" id="sheet-explain"><span class="prompt">$ rosio explain find:qos.incompatible|topic:/scan_filtered|a53e8bc7</span>
+    <pre class="sheet" id="sheet-explain"><span class="prompt">$ rosio explain find:qos.incompatible|topic:/scan_filtered|a53e8bc7</span>
 <span class="sev-error">error</span> qos.incompatible: /safety_stop never receives /scan_filtered
   about /scan_filtered
   in rover the coded layer has /scan_filter offering best effort on /scan_filtered and /safety_stop requesting reliable; a subscription that asks for more than a publisher offers is never matched
@@ -85,13 +84,13 @@
       rover_control/rover_control/safety_stop.py:18 rover_control.safety_stop.SafetyStop.__init__
       rover_perception/src/scan_filter.cpp:24 ScanFilter::ScanFilter
   profiles rover</pre>
-      <pre class="sheet" id="sheet-param"><span class="prompt">$ rosio param /controller_server use_sim_time</span>
+    <pre class="sheet" id="sheet-param"><span class="prompt">$ rosio param /controller_server use_sim_time</span>
 use_sim_time on /controller_server   state effective
   profile nav2_bringup_composed
     effective False (bool)   edit nav2_bringup/launch/navigation_launch.py:253 [install]
     rank 0 wins launch_inline_dict   False (bool)
         nav2_bringup/launch/navigation_launch.py:253 [install] SetParameter</pre>
-      <pre class="sheet" id="sheet-migrate"><span class="prompt">$ rosio migrate plan --from humble --to lyrical</span>
+    <pre class="sheet" id="sheet-migrate"><span class="prompt">$ rosio migrate plan --from humble --to lyrical</span>
 rosio migrate humble -&gt; lyrical: 35 changes in 7 packages, 0 rewritten by apply, 35 by hand
 
 action_tutorials_cpp
@@ -107,7 +106,7 @@ composition
                                      https://github.com/ament/ament_cmake/pull/614
   src/composition/CMakeLists.txt:63  removed in lyrical  ament_target_dependencies() is removed; link each package's exported targets with target_link_libraries; exports for example_interfaces, rclcpp, rclcpp_components are not measured per release; check the package's exported targets and link by hand
                                      https://github.com/ament/ament_cmake/pull/614</pre>
-      <pre class="sheet" id="sheet-agent">rosio atlas, schema 1.32, 1896 entities and 2247 edges
+    <pre class="sheet" id="sheet-agent">rosio atlas, schema 1.32, 1896 entities and 2247 edges
 layers present: declared   capabilities: drift.findings, layer.declared, param.candidates, profile.entrypoints
 profiles (1): nav2_bringup_composed
 entities: file 584, type 530, param 352, pparam 128, plugin 94, pkg 85, frame 48, pinst 24, launchent 18, node 17, and 4 more kinds
@@ -119,79 +118,142 @@ drift: 28 findings, 25 info, 3 warn
   <span class="sev-warn">warn</span>  param.orphan_block  block map_saver owns nothing in nav2_bringup_composed   nav2_bringup/params/nav2_params.yaml:271 [install]
   <span class="note">info</span>  plugin.inert_by_design  block static_layer is configured and not selected in nav2_bringup_composed   nav2_bringup/params/nav2_params.yaml:226 [install]
 next: param_chain for one parameter value, drift for the findings, explain for one entity, query for plain words</pre>
+  </figure>
+  <div class="show-text">
+    <div class="tabs" role="tablist" aria-label="Commands">
+      <button role="tab" aria-selected="true" aria-controls="sheet-drift" data-sheet="drift">drift</button>
+      <button role="tab" aria-selected="false" aria-controls="sheet-explain" tabindex="-1" data-sheet="explain">explain</button>
+      <button role="tab" aria-selected="false" aria-controls="sheet-param" tabindex="-1" data-sheet="param">param</button>
+      <button role="tab" aria-selected="false" aria-controls="sheet-migrate" tabindex="-1" data-sheet="migrate">migrate</button>
+      <button role="tab" aria-selected="false" aria-controls="sheet-agent" tabindex="-1" data-sheet="agent">agent</button>
     </div>
-    <div class="commands" role="tablist" aria-label="Commands">
-      <button role="tab" aria-selected="true" data-sheet="drift"><b>drift</b><span>worst first</span></button>
-      <button role="tab" aria-selected="false" data-sheet="explain"><b>explain</b><span>one finding</span></button>
-      <button role="tab" aria-selected="false" data-sheet="param"><b>param</b><span>nav2, use_sim_time</span></button>
-      <button role="tab" aria-selected="false" data-sheet="migrate"><b>migrate</b><span>humble to lyrical</span></button>
-      <button role="tab" aria-selected="false" data-sheet="agent"><b>agent</b><span>MCP overview</span></button>
+    <div class="show-words">
+      <h2 id="output-title">What it prints</h2>
+      <p>The example rover in the repository carries five faults on purpose. Each command on the left is its real output, worst finding first, every one with the file and the line to edit.</p>
+    </div>
+    <div class="cells">
+      <a class="cell ink" href="https://github.com/sa1ntsinner/rosio/tree/main/examples/rover_ws">Open the rover</a>
+      <a class="cell" href="https://github.com/sa1ntsinner/rosio/tree/main/docs">Read the docs</a>
     </div>
   </div>
 </section>
 
-<section class="where" aria-labelledby="where-title">
-  <h2 id="where-title">Where it runs</h2>
-  <div class="names">
-    <ul><li class="kind">Editors</li><li>Neovim</li><li>Zed</li><li>VS Code</li><li>Any LSP client</li></ul>
-    <ul><li class="kind">Assistants</li><li>Claude Code</li><li>Codex</li><li>Cursor</li><li>Gemini CLI</li><li>GitHub Copilot</li><li>Aider</li><li>OpenCode</li><li>Amp</li><li>Kilo</li></ul>
-    <ul><li class="kind">Middleware</li><li>Fast DDS</li><li>Cyclone DDS</li><li>Zenoh</li></ul>
-    <ul><li class="kind">ROS 2</li><li>humble</li><li>jazzy</li><li>Python 3.10 and later</li></ul>
+<section id="layers" class="layers" aria-labelledby="layers-title">
+  <div class="field">
+    <h2 id="layers-title">Four ways in</h2>
+    <div class="card" data-ui>
+      <p class="card-head"><b>/scan_filtered</b> in profile rover</p>
+      <p class="row" style="--c: var(--declared)"><span class="chip"></span>launch starts /scan_filter and /safety_stop</p>
+    </div>
+    <p class="clause">First it reads the launch files.</p>
+  </div>
+  <div class="field">
+    <div class="card" data-ui>
+      <p class="card-head"><b>/scan_filtered</b> in profile rover</p>
+      <p class="row" style="--c: var(--declared)"><span class="chip"></span>launch starts /scan_filter and /safety_stop</p>
+      <p class="row" style="--c: var(--coded)"><span class="chip"></span>publishes best effort, scan_filter.cpp:24</p>
+      <p class="row" style="--c: var(--coded)"><span class="chip"></span>subscribes reliable, safety_stop.py:18</p>
+    </div>
+    <p class="clause">Then the source code.</p>
+  </div>
+  <div class="field">
+    <div class="card" data-ui>
+      <p class="card-head"><b>/scan_filtered</b> in profile rover</p>
+      <p class="row" style="--c: var(--declared)"><span class="chip"></span>launch starts /scan_filter and /safety_stop</p>
+      <p class="row" style="--c: var(--coded)"><span class="chip"></span>publishes best effort, scan_filter.cpp:24</p>
+      <p class="row" style="--c: var(--coded)"><span class="chip"></span>subscribes reliable, safety_stop.py:18</p>
+      <p class="row" style="--c: var(--observed)"><span class="chip"></span>graph: both ends present, never matched</p>
+    </div>
+    <p class="clause">Then the running graph.</p>
+  </div>
+  <div class="field">
+    <div class="card" data-ui>
+      <p class="card-head"><b>/scan_filtered</b> in profile rover</p>
+      <p class="row" style="--c: var(--declared)"><span class="chip"></span>launch starts /scan_filter and /safety_stop</p>
+      <p class="row" style="--c: var(--coded)"><span class="chip"></span>publishes best effort, scan_filter.cpp:24</p>
+      <p class="row" style="--c: var(--coded)"><span class="chip"></span>subscribes reliable, safety_stop.py:18</p>
+      <p class="row" style="--c: var(--observed)"><span class="chip"></span>graph: both ends present, never matched</p>
+      <p class="row" style="--c: var(--recorded)"><span class="chip"></span>bag: /scan_filtered recorded, 10.0 Hz</p>
+      <p class="verdict"><span class="sev-error">error</span> qos.incompatible</p>
+    </div>
+    <p class="clause">Then the recorded bags.</p>
   </div>
 </section>
 
-<section class="cells-wrap" aria-labelledby="cells-title">
-  <h2 id="cells-title">In your editor</h2>
-  <div class="cells">
-    <article class="cell">
-      <div class="cell-text"><h3>Neovim</h3><p>A QoS that can never connect, on the line that creates the publisher.</p></div>
-      <figure class="frag"><img src="assets/neovim.jpg" width="1600" height="947" alt="Neovim with a QoS error on create_publisher in scan_filter.cpp" loading="lazy" style="--dx: -20px; --dy: -330px"></figure>
-    </article>
-    <article class="cell flip">
-      <div class="cell-text"><h3>Zed</h3><p>A misspelt key in a parameters file, with the name the node declares.</p></div>
-      <figure class="frag"><img src="assets/zed.jpg" width="1600" height="1002" alt="Zed with rosio diagnostics inline in rover.yaml" loading="lazy" style="--dx: -20px; --dy: -120px"></figure>
-    </article>
-    <article class="cell">
-      <div class="cell-text"><h3>Graph</h3><p>Every node and topic before the robot runs.</p></div>
-      <figure class="frag"><img src="assets/vscode-graph.jpg" width="1600" height="1002" alt="The rosio graph in VS Code around /scan_filtered" loading="lazy" style="--dx: -380px; --dy: -340px"></figure>
-    </article>
-    <article class="cell flip">
-      <div class="cell-text"><h3>Robot model</h3><p>The URDF drawn from its meshes, every frame named.</p></div>
-      <figure class="frag drift"><img src="assets/vscode-robot.jpg" width="1600" height="1002" alt="TurtleBot3 Burger drawn from its URDF in VS Code" loading="lazy" style="--dx: -560px; --dy: -330px"></figure>
-    </article>
-    <article class="cell">
-      <div class="cell-text"><h3>Clock stamps</h3><p>A TAI offset in a recording, named before it breaks TF.</p></div>
-      <pre class="frag code" data-ui><span class="prompt">$ rosio stamps tai_recording</span>
-<span class="sev-error">ERROR</span> epoch_offset /scan
-/scan offset -36.980 s matches the
-TAI to UTC offset (37 s)</pre>
-    </article>
-    <article class="cell flip">
-      <div class="cell-text"><h3>CI gate</h3><p>One exit code, and every waiver keeps its reason.</p></div>
-      <pre class="frag code" data-ui><span class="prompt">$ rosio drift --fail-on error</span>
-5 findings: 1 error, 0 info, 4 warn
-  <span class="sev-error">error</span> qos.incompatible
-<span class="prompt">$ echo $?</span>
-5</pre>
-    </article>
+<section id="checks" class="checks" aria-label="Five checks on the example rover">
+  <div class="band" data-on>
+    <h3>A QoS that never connects.</h3>
+    <button class="switch" data-ui role="switch" aria-checked="true" aria-label="Show the QoS finding"><i></i></button>
+    <p class="said"><span class="sev-error">error</span> /safety_stop asks reliable, /scan_filter offers best effort, at <code>scan_filter.cpp:24</code></p>
+  </div>
+  <div class="band">
+    <h3>A frame no model declares.</h3>
+    <button class="switch" data-ui role="switch" aria-checked="false" aria-label="Show the frame finding"><i></i></button>
+    <p class="said"><span class="sev-warn">warn</span> laser_frame is looked up at <code>scan_filter.cpp:34</code>, the model has laser_link</p>
+  </div>
+  <div class="band">
+    <h3>A key no node declares.</h3>
+    <button class="switch" data-ui role="switch" aria-checked="false" aria-label="Show the parameter key finding"><i></i></button>
+    <p class="said"><span class="sev-warn">warn</span> stop_distnce is set at <code>rover.yaml:9</code>, the node declares stop_distance</p>
+  </div>
+  <div class="band" data-on>
+    <h3>A value that never applies.</h3>
+    <button class="switch" data-ui role="switch" aria-checked="true" aria-label="Show the shadowed value finding"><i></i></button>
+    <p class="said"><span class="sev-warn">warn</span> 8.0 at <code>rover.yaml:4</code> loses to 10.0 at <code>bringup.launch.py:28</code></p>
+  </div>
+  <div class="band">
+    <h3>A clock 37 seconds off.</h3>
+    <button class="switch" data-ui role="switch" aria-checked="false" aria-label="Show the clock finding"><i></i></button>
+    <p class="said"><span class="sev-error">error</span> /scan stamps sit -36.980 s from the receive time, the TAI to UTC offset</p>
+  </div>
+</section>
+
+<section id="where" class="where" aria-labelledby="where-title">
+  <div class="where-head">
+    <h2 id="where-title">Where it runs</h2>
+    <p>The findings land where you already work: on the line in the editor, in a graph before the robot runs, and in the answers of a coding agent.</p>
+  </div>
+  <div class="shots">
+    <figure class="shot nvim">
+      <div class="crop"><img src="assets/where/neovim.webp" width="1100" height="400" alt="Neovim marking create_publisher in scan_filter.cpp with the QoS error"></div>
+      <figcaption><b>Neovim</b><span>LSP</span><p>A QoS that can never connect, on the line that creates the publisher.</p></figcaption>
+    </figure>
+    <figure class="shot robot">
+      <div class="crop"><img src="assets/where/vscode-robot.webp" width="800" height="680" alt="TurtleBot3 Burger drawn from its URDF with every frame named"></div>
+      <figcaption><b>Robot model</b><span>VS Code</span><p>The URDF drawn from its meshes, every frame named.</p></figcaption>
+    </figure>
+    <figure class="shot zed">
+      <div class="crop"><img src="assets/where/zed.webp" width="1300" height="528" alt="Zed showing rosio findings inline in rover.yaml"></div>
+      <figcaption><b>Zed</b><span>LSP</span><p>A misspelt key, a shadowed value and a block no node reads, inline in the parameters file.</p></figcaption>
+    </figure>
+    <figure class="shot graph">
+      <div class="crop"><img src="assets/where/vscode-graph.webp" width="1480" height="570" alt="The rosio graph in VS Code around /scan_filtered with the QoS finding open"></div>
+      <figcaption><b>Graph</b><span>VS Code</span><p>Every node and topic of a profile, drawn before the robot runs, with the finding on the topic it breaks.</p></figcaption>
+    </figure>
+  </div>
+  <div class="needs">
+    <div><h3>Agents</h3><p>Claude Code, Codex, Cursor, Gemini CLI, Copilot, Aider, OpenCode, Amp and Kilo read the atlas through twelve MCP tools.</p><code>rosio install claude-code</code></div>
+    <div><h3>Python 3.10 and later</h3><p>One install. The core needs PyYAML and nothing else; C++ reading, bag stamps and the MCP server are extras.</p><code>pip install rosio</code></div>
+    <div><h3>ROS 2 humble and jazzy</h3><p>The running graph is read over Fast DDS, Cyclone DDS or Zenoh, and recordings through rosbag2.</p><code>rosio probe</code></div>
   </div>
 </section>
 
 <section id="install" class="close" aria-labelledby="install-title">
-  <h2 id="install-title" class="quiet-title">Install</h2>
-  <p>Install it, run it on your workspace, and fix the first line it names.</p>
-  <div class="act">
-    <button class="button copy" type="button" data-copy='pip install "rosio[cpp,stamps,mcp]"'>pip install rosio</button>
-    <a class="link" href="https://github.com/sa1ntsinner/rosio#quickstart">Quickstart</a>
-  </div>
+  <h2 id="install-title">Run it on your workspace.</h2>
+  <p>Install it, point it at the workspace, and fix the first line it names.</p>
+  <button class="button dark copy" type="button" data-copy='pip install "rosio[cpp,stamps,mcp]"'>pip install rosio</button>
 </section>
 </main>
 
 <footer class="foot">
-  <span>rosio, the ROS 2 atlas</span>
-  <nav aria-label="Elsewhere"><a href="https://github.com/sa1ntsinner/rosio">GitHub</a><a href="https://github.com/sa1ntsinner/rosio/tree/main/docs">Docs</a><a href="https://pypi.org/project/rosio/">PyPI</a><a href="https://marketplace.visualstudio.com/items?itemName=sa1ntsinner.rosio">VS Code</a></nav>
-  <span class="end">2026 · Apache 2.0</span>
+  <div class="links">
+    <nav aria-label="Project"><a href="https://github.com/sa1ntsinner/rosio">GitHub</a><a href="https://github.com/sa1ntsinner/rosio/tree/main/docs">Docs</a><a href="https://github.com/sa1ntsinner/rosio#quickstart">Quickstart</a></nav>
+    <nav aria-label="Packages"><a href="https://pypi.org/project/rosio/">PyPI</a><a href="https://marketplace.visualstudio.com/items?itemName=sa1ntsinner.rosio">VS Code</a><a href="https://open-vsx.org/extension/sa1ntsinner/rosio">Open VSX</a></nav>
+    <p>rosio, the ROS 2 atlas.<br>Apache 2.0, 2026.</p>
+    <a class="button small" href="#top">Back to the top</a>
+  </div>
 </footer>
 <script src="site.js" defer></script>
+<script type="module" src="mark.js"></script>
 </body>
 </html>
