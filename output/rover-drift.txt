@@ -1,20 +1,37 @@
 $ rosio drift
-5 findings: 1 error, 0 info, 4 warn
-  error qos.incompatible  /safety_stop never receives /scan_filtered
-        /safety_stop subscribes to /scan_filtered requesting reliable while /scan_filter publishes it best effort, so the two never connect and no message arrives.
-        rover_control/rover_control/safety_stop.py:18 rover_control.safety_stop.SafetyStop.__init__
-        rover_perception/src/scan_filter.cpp:24 ScanFilter::ScanFilter
-  warn  frame.not_in_urdf  /scan_filter looks up laser_frame, which no robot model has
-        rover_perception/src/scan_filter.cpp:34 looks up the frame laser_frame, which no robot model declares and nothing publishes, so the lookup never succeeds, the model has laser_link.
-        rover_perception/src/scan_filter.cpp:34 ScanFilter::on_scan
-  warn  param.orphan_block  block odometry owns nothing in rover
-        rover_bringup/config/rover.yaml:12 configures a node called odometry with 1 key and profile rover launches no node by that name or a similar one. Launch the node in rover, or delete the block at rover_bringup/config/rover.yaml:12 once no profile launches it.
-        rover_bringup/config/rover.yaml:12 odometry
-  warn  param.set_undeclared  stop_distnce is set for /safety_stop and never declared
-        In profile rover, rover_bringup/config/rover.yaml:9 sets /safety_stop stop_distnce to 0.35 and rover_control/rover_control/safety_stop.py declares no parameter with that name, so the value is ignored. /safety_stop declares stop_distance, which is likely what was meant.
-        rover_bringup/config/rover.yaml:9 safety_stop.ros__parameters.stop_distnce
-  warn  param.shadowed  max_range at rover_bringup/config/rover.yaml:4 is overridden
-        In profile rover, /scan_filter max_range is 10.0 from rover_bringup/launch/bringup.launch.py:28, so 8.0 at rover_bringup/config/rover.yaml:4 never takes effect. Edit rover_bringup/launch/bringup.launch.py:28 to change it.
-        rover_bringup/config/rover.yaml:4 scan_filter.ros__parameters.max_range
-        rover_bringup/launch/bringup.launch.py:28 parameters
-  explain a finding id for the full evidence
+5 findings: 1 error, 4 warn
+
+  error  rover_control/rover_control/safety_stop.py:18
+         /safety_stop never receives /scan_filtered in rover  (qos.incompatible)
+         /safety_stop subscribes to /scan_filtered requesting reliable while /scan_filter publishes it best effort, so the two never connect and no message arrives.
+         also rover_perception/src/scan_filter.cpp:24
+         fix: make /safety_stop request best effort, or make /scan_filter offer reliable, on both ends of the topic
+         explain sha256:c1ebb8a4dcad5642
+
+  warn   rover_perception/src/scan_filter.cpp:34
+         /scan_filter looks up laser_frame, which no robot model has  (frame.not_in_urdf)
+         rover_perception/src/scan_filter.cpp:34 looks up the frame laser_frame, which no robot model declares and nothing publishes, so the lookup never succeeds, the model has laser_link.
+         fix: correct the frame name at rover_perception/src/scan_filter.cpp:34, the model has laser_link, or declare laser_frame in the model
+         explain sha256:cf45850ba57b341b
+
+  warn   rover_bringup/config/rover.yaml:12
+         block odometry owns nothing in rover  (param.orphan_block)
+         rover_bringup/config/rover.yaml:12 configures a node called odometry with 1 key and profile rover launches no node by that name or a similar one. Launch the node there, or delete the block at rover_bringup/config/rover.yaml:12 once no profile launches it.
+         fix: Launch the node in profile rover, or delete the odometry block once no profile launches it.
+         explain sha256:3065b6eec80640a2
+
+  warn   rover_bringup/config/rover.yaml:9
+         stop_distnce is set for /safety_stop and never declared  (param.set_undeclared)
+         In profile rover, rover_bringup/config/rover.yaml:9 sets /safety_stop stop_distnce to 0.35 and rover_control/rover_control/safety_stop.py declares no parameter with that name, so the value is ignored. /safety_stop declares stop_distance, which is likely what was meant.
+         fix: Rename stop_distnce to stop_distance at rover_bringup/config/rover.yaml:9, or correct the declaration if stop_distance is the misspelling.
+         explain sha256:9a95f3b696408c0b
+
+  warn   rover_bringup/config/rover.yaml:4
+         max_range at rover_bringup/config/rover.yaml:4 is overridden  (param.shadowed)
+         In profile rover, /scan_filter max_range is 10.0 from rover_bringup/launch/bringup.launch.py:32, so 8.0 at rover_bringup/config/rover.yaml:4 never takes effect. Edit rover_bringup/launch/bringup.launch.py:32 to change it.
+         also rover_bringup/launch/bringup.launch.py:32
+         fix: Change the value at rover_bringup/launch/bringup.launch.py:32, or remove the losing line at rover_bringup/config/rover.yaml:4 so one file states it.
+         explain sha256:b6f316b409a59f3d
+
+  rosio drift --fix applies 2 exact fixes
+  explain takes a fingerprint above, a finding id or a rule id

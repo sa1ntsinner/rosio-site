@@ -1,5 +1,5 @@
-$ rosio explain find:qos.incompatible|topic:/scan_filtered|a53e8bc7
-error qos.incompatible: /safety_stop never receives /scan_filtered
+$ rosio explain sha256:c1ebb8a4dcad5642
+error qos.incompatible: /safety_stop never receives /scan_filtered in rover
   about /scan_filtered
   in rover the coded layer has /scan_filter offering best effort on /scan_filtered and /safety_stop requesting reliable; a subscription that asks for more than a publisher offers is never matched
   fix: make /safety_stop request best effort, or make /scan_filter offer reliable, on both ends of the topic

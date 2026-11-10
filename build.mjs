@@ -18,6 +18,7 @@ function terminal(text) {
 
 const outputs = {
   "rover-drift": read("output/rover-drift.txt"),
+  "rover-fix": read("output/rover-fix.txt"),
   "rover-explain": read("output/rover-explain.txt"),
   "nav2-param": read("output/nav2-param.txt"),
   migrate: read("output/migrate.txt"),

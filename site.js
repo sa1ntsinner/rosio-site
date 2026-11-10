@@ -1,7 +1,7 @@
 // The reader shows one parameter by layer, the tabs switch command output, the switches open
 // a finding, the button copies.
 const said = {
-  declared: '10.0 wins, set at <code>bringup.launch.py:28</code>. The 8.0 in <code>rover.yaml:4</code> never applies.',
+  declared: '10.0 wins, set at <code>bringup.launch.py:32</code>. The 8.0 in <code>rover.yaml:4</code> never applies.',
   coded: 'The code declares 12.0 as the default at <code>scan_filter.cpp:21</code>. It applies only when nothing sets the parameter.',
   observed: 'Run <code>rosio probe</code> beside the robot and the value the node really holds appears here.',
   recorded: 'A bag records topics, not parameters, so this layer has nothing to say about this one.',

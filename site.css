@@ -178,6 +178,8 @@ figcaption p { grid-column: 1 / -1; max-width: 60ch; color: var(--ink); }
 /* the close: one chrome field */
 .close { display: grid; align-content: center; justify-items: start; gap: 24px; margin: var(--gap) var(--margin) 0; padding: clamp(40px, 7vw, 120px); min-height: 60svh; background: var(--accent); color: var(--bg); }
 .close p { font-size: 1.25rem; max-width: 34ch; }
+.close .release { font-size: 1rem; max-width: 62ch; opacity: .78; }
+.close .release a, .foot p a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .copy.done { background: var(--ink); color: var(--bg); }
 
 /* the footer */

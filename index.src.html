@@ -36,19 +36,19 @@
       <p class="reader-name"><b>max_range</b> on /scan_filter</p>
       <div class="scale" role="radiogroup" aria-label="Layer">
         <button role="radio" aria-checked="true" tabindex="0" data-layer="declared" style="--c: var(--declared); --v: 10">
-          <span class="layer">declared</span><span class="gauge"><i></i></span><span class="value">10.0</span>
+          <span class="layer">config</span><span class="gauge"><i></i></span><span class="value">10.0</span>
         </button>
         <button role="radio" aria-checked="false" tabindex="-1" data-layer="coded" style="--c: var(--coded); --v: 12">
-          <span class="layer">coded</span><span class="gauge"><i></i></span><span class="value">12.0</span>
+          <span class="layer">code</span><span class="gauge"><i></i></span><span class="value">12.0</span>
         </button>
         <button role="radio" aria-checked="false" tabindex="-1" data-layer="observed" style="--c: var(--observed); --v: 0">
-          <span class="layer">observed</span><span class="gauge"><i></i></span><span class="value">not run</span>
+          <span class="layer">live</span><span class="gauge"><i></i></span><span class="value">not run</span>
         </button>
         <button role="radio" aria-checked="false" tabindex="-1" data-layer="recorded" style="--c: var(--recorded); --v: 0">
-          <span class="layer">recorded</span><span class="gauge"><i></i></span><span class="value">none</span>
+          <span class="layer">bag</span><span class="gauge"><i></i></span><span class="value">none</span>
         </button>
       </div>
-      <p class="readout" aria-live="polite">10.0 wins, set at <code>bringup.launch.py:28</code>. The 8.0 in <code>rover.yaml:4</code> never applies.</p>
+      <p class="readout" aria-live="polite">10.0 wins, set at <code>bringup.launch.py:32</code>. The 8.0 in <code>rover.yaml:4</code> never applies.</p>
     </div>
   </div>
 </section>
@@ -56,6 +56,7 @@
 <section id="output" class="show" aria-labelledby="output-title">
   <figure class="plate" data-ui>
     <pre class="sheet is-on" id="sheet-drift">{{rover-drift}}</pre>
+    <pre class="sheet" id="sheet-fix">{{rover-fix}}</pre>
     <pre class="sheet" id="sheet-explain">{{rover-explain}}</pre>
     <pre class="sheet" id="sheet-param">{{nav2-param}}</pre>
     <pre class="sheet" id="sheet-migrate">{{migrate}}</pre>
@@ -64,6 +65,7 @@
   <div class="show-text">
     <div class="tabs" role="tablist" aria-label="Commands">
       <button role="tab" aria-selected="true" aria-controls="sheet-drift" data-sheet="drift">drift</button>
+      <button role="tab" aria-selected="false" aria-controls="sheet-fix" tabindex="-1" data-sheet="fix">fix</button>
       <button role="tab" aria-selected="false" aria-controls="sheet-explain" tabindex="-1" data-sheet="explain">explain</button>
       <button role="tab" aria-selected="false" aria-controls="sheet-param" tabindex="-1" data-sheet="param">param</button>
       <button role="tab" aria-selected="false" aria-controls="sheet-migrate" tabindex="-1" data-sheet="migrate">migrate</button>
@@ -71,7 +73,7 @@
     </div>
     <div class="show-words">
       <h2 id="output-title">What it prints</h2>
-      <p>The example rover in the repository carries five faults on purpose. Each command on the left is its real output, worst finding first, every one with the file and the line to edit.</p>
+      <p>The example rover in the repository carries five faults on purpose. Each command on the left is its real output, worst finding first, every one with the file and the line to edit. Where the fix is one exact replacement, <code>rosio drift --fix</code> writes it.</p>
     </div>
     <div class="cells">
       <a class="cell ink" href="https://github.com/sa1ntsinner/rosio/tree/main/examples/rover_ws">Open the rover</a>
@@ -141,7 +143,7 @@
   <div class="band" data-on>
     <h3>A value that never applies.</h3>
     <button class="switch" data-ui role="switch" aria-checked="true" aria-label="Show the shadowed value finding"><i></i></button>
-    <p class="said"><span class="sev-warn">warn</span> 8.0 at <code>rover.yaml:4</code> loses to 10.0 at <code>bringup.launch.py:28</code></p>
+    <p class="said"><span class="sev-warn">warn</span> 8.0 at <code>rover.yaml:4</code> loses to 10.0 at <code>bringup.launch.py:32</code></p>
   </div>
   <div class="band">
     <h3>A clock 37 seconds off.</h3>
@@ -174,7 +176,7 @@
     </figure>
   </div>
   <div class="needs">
-    <div><h3>Agents</h3><p>Claude Code, Codex, Cursor, Gemini CLI, Copilot, Aider, OpenCode, Amp and Kilo read the atlas through twelve MCP tools.</p><code>rosio install claude-code</code></div>
+    <div><h3>Agents</h3><p>Claude Code, Codex, Cursor, Gemini CLI, Copilot, Aider, OpenCode, Amp and Kilo read the atlas through the MCP server.</p><code>rosio install claude-code</code></div>
     <div><h3>Python 3.10 and later</h3><p>One install. The core needs PyYAML and nothing else; C++ reading, bag stamps and the MCP server are extras.</p><code>pip install rosio</code></div>
     <div><h3>ROS 2 humble and jazzy</h3><p>The running graph is read over Fast DDS, Cyclone DDS or Zenoh, and recordings through rosbag2.</p><code>rosio probe</code></div>
   </div>
@@ -184,6 +186,7 @@
   <h2 id="install-title">Run it on your workspace.</h2>
   <p>Install it, point it at the workspace, and fix the first line it names.</p>
   <button class="button dark copy" type="button" data-copy='pip install "rosio[cpp,stamps,mcp]"'>pip install rosio</button>
+  <p class="release">Version 0.2.0. <code>rosio drift --fix</code> writes the exact fixes, VS Code applies all of them with <code>Ctrl+Alt+.</code> and extracts again, and the layers are called config, code, live and bag. <a href="https://github.com/sa1ntsinner/rosio/releases/tag/v0.2.0">What changed</a></p>
 </section>
 </main>
 
@@ -191,7 +194,7 @@
   <div class="links">
     <nav aria-label="Project"><a href="https://github.com/sa1ntsinner/rosio">GitHub</a><a href="https://github.com/sa1ntsinner/rosio/tree/main/docs">Docs</a><a href="https://github.com/sa1ntsinner/rosio#quickstart">Quickstart</a></nav>
     <nav aria-label="Packages"><a href="https://pypi.org/project/rosio/">PyPI</a><a href="https://marketplace.visualstudio.com/items?itemName=sa1ntsinner.rosio">VS Code</a><a href="https://open-vsx.org/extension/sa1ntsinner/rosio">Open VSX</a></nav>
-    <p>rosio, the ROS 2 atlas.<br>Apache 2.0, 2026.</p>
+    <p>rosio, the ROS 2 atlas.<br>Free and open source, Apache 2.0.<br>Companies who want support or custom terms can <a href="https://github.com/sa1ntsinner">get in touch</a>.</p>
     <a class="button small" href="#top">Back to the top</a>
   </div>
 </footer>

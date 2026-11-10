@@ -1,0 +1,4 @@
+$ rosio drift --fix
+  fixed       rover_perception/src/scan_filter.cpp:34: laser_frame is now laser_link
+  fixed       rover_bringup/config/rover.yaml:9: stop_distnce is now stop_distance
+2 lines edited, rosio extract again to see what is left

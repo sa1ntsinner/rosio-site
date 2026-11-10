@@ -36,19 +36,19 @@
       <p class="reader-name"><b>max_range</b> on /scan_filter</p>
       <div class="scale" role="radiogroup" aria-label="Layer">
         <button role="radio" aria-checked="true" tabindex="0" data-layer="declared" style="--c: var(--declared); --v: 10">
-          <span class="layer">declared</span><span class="gauge"><i></i></span><span class="value">10.0</span>
+          <span class="layer">config</span><span class="gauge"><i></i></span><span class="value">10.0</span>
         </button>
         <button role="radio" aria-checked="false" tabindex="-1" data-layer="coded" style="--c: var(--coded); --v: 12">
-          <span class="layer">coded</span><span class="gauge"><i></i></span><span class="value">12.0</span>
+          <span class="layer">code</span><span class="gauge"><i></i></span><span class="value">12.0</span>
         </button>
         <button role="radio" aria-checked="false" tabindex="-1" data-layer="observed" style="--c: var(--observed); --v: 0">
-          <span class="layer">observed</span><span class="gauge"><i></i></span><span class="value">not run</span>
+          <span class="layer">live</span><span class="gauge"><i></i></span><span class="value">not run</span>
         </button>
         <button role="radio" aria-checked="false" tabindex="-1" data-layer="recorded" style="--c: var(--recorded); --v: 0">
-          <span class="layer">recorded</span><span class="gauge"><i></i></span><span class="value">none</span>
+          <span class="layer">bag</span><span class="gauge"><i></i></span><span class="value">none</span>
         </button>
       </div>
-      <p class="readout" aria-live="polite">10.0 wins, set at <code>bringup.launch.py:28</code>. The 8.0 in <code>rover.yaml:4</code> never applies.</p>
+      <p class="readout" aria-live="polite">10.0 wins, set at <code>bringup.launch.py:32</code>. The 8.0 in <code>rover.yaml:4</code> never applies.</p>
     </div>
   </div>
 </section>
@@ -56,27 +56,48 @@
 <section id="output" class="show" aria-labelledby="output-title">
   <figure class="plate" data-ui>
     <pre class="sheet is-on" id="sheet-drift"><span class="prompt">$ rosio drift</span>
-5 findings: 1 error, 0 info, 4 warn
-  <span class="sev-error">error</span> qos.incompatible  /safety_stop never receives /scan_filtered
-        /safety_stop subscribes to /scan_filtered requesting reliable while /scan_filter publishes it best effort, so the two never connect and no message arrives.
-        rover_control/rover_control/safety_stop.py:18 rover_control.safety_stop.SafetyStop.__init__
-        rover_perception/src/scan_filter.cpp:24 ScanFilter::ScanFilter
-  <span class="sev-warn">warn</span>  frame.not_in_urdf  /scan_filter looks up laser_frame, which no robot model has
-        rover_perception/src/scan_filter.cpp:34 looks up the frame laser_frame, which no robot model declares and nothing publishes, so the lookup never succeeds, the model has laser_link.
-        rover_perception/src/scan_filter.cpp:34 ScanFilter::on_scan
-  <span class="sev-warn">warn</span>  param.orphan_block  block odometry owns nothing in rover
-        rover_bringup/config/rover.yaml:12 configures a node called odometry with 1 key and profile rover launches no node by that name or a similar one. Launch the node in rover, or delete the block at rover_bringup/config/rover.yaml:12 once no profile launches it.
-        rover_bringup/config/rover.yaml:12 odometry
-  <span class="sev-warn">warn</span>  param.set_undeclared  stop_distnce is set for /safety_stop and never declared
-        In profile rover, rover_bringup/config/rover.yaml:9 sets /safety_stop stop_distnce to 0.35 and rover_control/rover_control/safety_stop.py declares no parameter with that name, so the value is ignored. /safety_stop declares stop_distance, which is likely what was meant.
-        rover_bringup/config/rover.yaml:9 safety_stop.ros__parameters.stop_distnce
-  <span class="sev-warn">warn</span>  param.shadowed  max_range at rover_bringup/config/rover.yaml:4 is overridden
-        In profile rover, /scan_filter max_range is 10.0 from rover_bringup/launch/bringup.launch.py:28, so 8.0 at rover_bringup/config/rover.yaml:4 never takes effect. Edit rover_bringup/launch/bringup.launch.py:28 to change it.
-        rover_bringup/config/rover.yaml:4 scan_filter.ros__parameters.max_range
-        rover_bringup/launch/bringup.launch.py:28 parameters
-  explain a finding id for the full evidence</pre>
-    <pre class="sheet" id="sheet-explain"><span class="prompt">$ rosio explain find:qos.incompatible|topic:/scan_filtered|a53e8bc7</span>
-<span class="sev-error">error</span> qos.incompatible: /safety_stop never receives /scan_filtered
+5 findings: 1 error, 4 warn
+
+  <span class="sev-error">error</span>  rover_control/rover_control/safety_stop.py:18
+         /safety_stop never receives /scan_filtered in rover  (qos.incompatible)
+         /safety_stop subscribes to /scan_filtered requesting reliable while /scan_filter publishes it best effort, so the two never connect and no message arrives.
+         also rover_perception/src/scan_filter.cpp:24
+         fix: make /safety_stop request best effort, or make /scan_filter offer reliable, on both ends of the topic
+         explain sha256:c1ebb8a4dcad5642
+
+  <span class="sev-warn">warn</span>   rover_perception/src/scan_filter.cpp:34
+         /scan_filter looks up laser_frame, which no robot model has  (frame.not_in_urdf)
+         rover_perception/src/scan_filter.cpp:34 looks up the frame laser_frame, which no robot model declares and nothing publishes, so the lookup never succeeds, the model has laser_link.
+         fix: correct the frame name at rover_perception/src/scan_filter.cpp:34, the model has laser_link, or declare laser_frame in the model
+         explain sha256:cf45850ba57b341b
+
+  <span class="sev-warn">warn</span>   rover_bringup/config/rover.yaml:12
+         block odometry owns nothing in rover  (param.orphan_block)
+         rover_bringup/config/rover.yaml:12 configures a node called odometry with 1 key and profile rover launches no node by that name or a similar one. Launch the node there, or delete the block at rover_bringup/config/rover.yaml:12 once no profile launches it.
+         fix: Launch the node in profile rover, or delete the odometry block once no profile launches it.
+         explain sha256:3065b6eec80640a2
+
+  <span class="sev-warn">warn</span>   rover_bringup/config/rover.yaml:9
+         stop_distnce is set for /safety_stop and never declared  (param.set_undeclared)
+         In profile rover, rover_bringup/config/rover.yaml:9 sets /safety_stop stop_distnce to 0.35 and rover_control/rover_control/safety_stop.py declares no parameter with that name, so the value is ignored. /safety_stop declares stop_distance, which is likely what was meant.
+         fix: Rename stop_distnce to stop_distance at rover_bringup/config/rover.yaml:9, or correct the declaration if stop_distance is the misspelling.
+         explain sha256:9a95f3b696408c0b
+
+  <span class="sev-warn">warn</span>   rover_bringup/config/rover.yaml:4
+         max_range at rover_bringup/config/rover.yaml:4 is overridden  (param.shadowed)
+         In profile rover, /scan_filter max_range is 10.0 from rover_bringup/launch/bringup.launch.py:32, so 8.0 at rover_bringup/config/rover.yaml:4 never takes effect. Edit rover_bringup/launch/bringup.launch.py:32 to change it.
+         also rover_bringup/launch/bringup.launch.py:32
+         fix: Change the value at rover_bringup/launch/bringup.launch.py:32, or remove the losing line at rover_bringup/config/rover.yaml:4 so one file states it.
+         explain sha256:b6f316b409a59f3d
+
+  rosio drift --fix applies 2 exact fixes
+  explain takes a fingerprint above, a finding id or a rule id</pre>
+    <pre class="sheet" id="sheet-fix"><span class="prompt">$ rosio drift --fix</span>
+  fixed       rover_perception/src/scan_filter.cpp:34: laser_frame is now laser_link
+  fixed       rover_bringup/config/rover.yaml:9: stop_distnce is now stop_distance
+2 lines edited, rosio extract again to see what is left</pre>
+    <pre class="sheet" id="sheet-explain"><span class="prompt">$ rosio explain sha256:c1ebb8a4dcad5642</span>
+<span class="sev-error">error</span> qos.incompatible: /safety_stop never receives /scan_filtered in rover
   about /scan_filtered
   in rover the coded layer has /scan_filter offering best effort on /scan_filtered and /safety_stop requesting reliable; a subscription that asks for more than a publisher offers is never matched
   fix: make /safety_stop request best effort, or make /scan_filter offer reliable, on both ends of the topic
@@ -122,6 +143,7 @@ next: param_chain for one parameter value, drift for the findings, explain for o
   <div class="show-text">
     <div class="tabs" role="tablist" aria-label="Commands">
       <button role="tab" aria-selected="true" aria-controls="sheet-drift" data-sheet="drift">drift</button>
+      <button role="tab" aria-selected="false" aria-controls="sheet-fix" tabindex="-1" data-sheet="fix">fix</button>
       <button role="tab" aria-selected="false" aria-controls="sheet-explain" tabindex="-1" data-sheet="explain">explain</button>
       <button role="tab" aria-selected="false" aria-controls="sheet-param" tabindex="-1" data-sheet="param">param</button>
       <button role="tab" aria-selected="false" aria-controls="sheet-migrate" tabindex="-1" data-sheet="migrate">migrate</button>
@@ -129,7 +151,7 @@ next: param_chain for one parameter value, drift for the findings, explain for o
     </div>
     <div class="show-words">
       <h2 id="output-title">What it prints</h2>
-      <p>The example rover in the repository carries five faults on purpose. Each command on the left is its real output, worst finding first, every one with the file and the line to edit.</p>
+      <p>The example rover in the repository carries five faults on purpose. Each command on the left is its real output, worst finding first, every one with the file and the line to edit. Where the fix is one exact replacement, <code>rosio drift --fix</code> writes it.</p>
     </div>
     <div class="cells">
       <a class="cell ink" href="https://github.com/sa1ntsinner/rosio/tree/main/examples/rover_ws">Open the rover</a>
@@ -199,7 +221,7 @@ next: param_chain for one parameter value, drift for the findings, explain for o
   <div class="band" data-on>
     <h3>A value that never applies.</h3>
     <button class="switch" data-ui role="switch" aria-checked="true" aria-label="Show the shadowed value finding"><i></i></button>
-    <p class="said"><span class="sev-warn">warn</span> 8.0 at <code>rover.yaml:4</code> loses to 10.0 at <code>bringup.launch.py:28</code></p>
+    <p class="said"><span class="sev-warn">warn</span> 8.0 at <code>rover.yaml:4</code> loses to 10.0 at <code>bringup.launch.py:32</code></p>
   </div>
   <div class="band">
     <h3>A clock 37 seconds off.</h3>
@@ -232,7 +254,7 @@ next: param_chain for one parameter value, drift for the findings, explain for o
     </figure>
   </div>
   <div class="needs">
-    <div><h3>Agents</h3><p>Claude Code, Codex, Cursor, Gemini CLI, Copilot, Aider, OpenCode, Amp and Kilo read the atlas through twelve MCP tools.</p><code>rosio install claude-code</code></div>
+    <div><h3>Agents</h3><p>Claude Code, Codex, Cursor, Gemini CLI, Copilot, Aider, OpenCode, Amp and Kilo read the atlas through the MCP server.</p><code>rosio install claude-code</code></div>
     <div><h3>Python 3.10 and later</h3><p>One install. The core needs PyYAML and nothing else; C++ reading, bag stamps and the MCP server are extras.</p><code>pip install rosio</code></div>
     <div><h3>ROS 2 humble and jazzy</h3><p>The running graph is read over Fast DDS, Cyclone DDS or Zenoh, and recordings through rosbag2.</p><code>rosio probe</code></div>
   </div>
@@ -242,6 +264,7 @@ next: param_chain for one parameter value, drift for the findings, explain for o
   <h2 id="install-title">Run it on your workspace.</h2>
   <p>Install it, point it at the workspace, and fix the first line it names.</p>
   <button class="button dark copy" type="button" data-copy='pip install "rosio[cpp,stamps,mcp]"'>pip install rosio</button>
+  <p class="release">Version 0.2.0. <code>rosio drift --fix</code> writes the exact fixes, VS Code applies all of them with <code>Ctrl+Alt+.</code> and extracts again, and the layers are called config, code, live and bag. <a href="https://github.com/sa1ntsinner/rosio/releases/tag/v0.2.0">What changed</a></p>
 </section>
 </main>
 
@@ -249,7 +272,7 @@ next: param_chain for one parameter value, drift for the findings, explain for o
   <div class="links">
     <nav aria-label="Project"><a href="https://github.com/sa1ntsinner/rosio">GitHub</a><a href="https://github.com/sa1ntsinner/rosio/tree/main/docs">Docs</a><a href="https://github.com/sa1ntsinner/rosio#quickstart">Quickstart</a></nav>
     <nav aria-label="Packages"><a href="https://pypi.org/project/rosio/">PyPI</a><a href="https://marketplace.visualstudio.com/items?itemName=sa1ntsinner.rosio">VS Code</a><a href="https://open-vsx.org/extension/sa1ntsinner/rosio">Open VSX</a></nav>
-    <p>rosio, the ROS 2 atlas.<br>Apache 2.0, 2026.</p>
+    <p>rosio, the ROS 2 atlas.<br>Free and open source, Apache 2.0.<br>Companies who want support or custom terms can <a href="https://github.com/sa1ntsinner">get in touch</a>.</p>
     <a class="button small" href="#top">Back to the top</a>
   </div>
 </footer>
